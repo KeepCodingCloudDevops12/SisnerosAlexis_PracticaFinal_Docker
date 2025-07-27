@@ -78,9 +78,11 @@ def increment_counter():
     conn.close()
     return jsonify({"new_value": new_value})
 
+print("Iniciando configuración de la base de datos...")
+setup_database()
+print("¡Base de datos lista!")
+
+
 if __name__ == '__main__':
-    print("Iniciando configuración de la base de datos...")
-    setup_database()
-    print("¡Aplicación lista para recibir peticiones!")
-    # Escucha en todas las interfaces de red dentro del contenedor
+    # Esto solo se usará si ejecutas 'python app.py' directamente
     app.run(host='0.0.0.0', port=5000)
