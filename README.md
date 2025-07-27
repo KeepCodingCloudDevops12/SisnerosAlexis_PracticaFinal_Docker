@@ -72,3 +72,17 @@ Para gestionar los contenedores (ver logs, estadísticas, entrar a una terminal,
 
 ```bash
 docker volume create portainer_data
+
+2. Desplegar el Contenedor de Portainer
+
+docker run -d -p 8000:8000 -p 9443:9443 --name portainer \
+    --restart=always \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v portainer_data:/data \
+    portainer/portainer-ce:latest
+
+3. Acceder a Portainer
+Abre tu navegador web y navega a: https://localhost:9443
+Es posible que tu navegador te muestre una advertencia de seguridad porque Portainer usa un certificado SSL autofirmado. Simplemente acepta el riesgo y continúa.
+La primera vez que accedas, Portainer te pedirá que crees una contraseña para el usuario admin.
+Una vez dentro, podrás ver y gestionar todos tus contenedores, incluidos bootcamp-frontend, bootcamp-app y bootcamp-db.
