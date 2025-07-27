@@ -1,0 +1,46 @@
+
+---
+
+### **Paso 5: Crear el `docker-compose.yml`**
+
+Este archivo orquesta nuestros servicios (`app` y `db`). Define cómo se comunican, las variables de entorno, los volúmenes para persistencia, etc.
+
+Edita el archivo `docker-compose.yml`:
+
+```yaml
+version: '3.8'
+
+services:
+  # Servicio de nuestra aplicación
+  app:
+    build: .  # Construye la imagen usando el Dockerfile en el directorio actual
+    container_name: bootcamp-app
+    ports:
+      - "5000:5000" # Mapea el puerto 5000 del host al 5000 del contenedor
+    environment:
+      # Variables de entorno para la conexión a la BD
+      # Docker Compose las pasa al contenedor de la app
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=db # El nombre del host de la BD es el nombre del servicio 'db'
+    depends_on:
+      - db # Le dice a Docker que inicie el servicio 'db' antes que 'app'
+
+  # Servicio de la base de datos
+  db:
+    image: postgres:14-alpine # Usamos una imagen ligera de Postgres
+    container_name: bootcamp-db
+    environment:
+      # Estas variables son usadas por la imagen de Postgres para inicializar la BD
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Monta un volumen para persistencia
+    ports:
+      - "5432:5432" # Opcional: para conectar a la BD desde tu máquina local
+
+# Docker gestionará la creación de este volumen
+volumes:
+  postgres_data:
