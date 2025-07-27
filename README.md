@@ -44,5 +44,16 @@ Sigue estos pasos para poner en marcha el proyecto en tu máquina local.
 ### 1. Clonar el Repositorio
 
 ```bash
-git clone https://github.com/KeepCodingCloudDevops12/SisnerosAlexis_PracticaFinalDocker.git
-cd SisnerosAlexis_PracticaFinalDocker
+git clone https://github.com/KeepCodingCloudDevops12/SisnerosAlexis_PracticaFinal_Docker.git
+cd PracticaFinal_Docker
+
+### 2: Crear el Archivo de Credenciales (`.env`)
+
+Este paso es **CRUCIAL**. La aplicación no funcionará sin él. El repositorio incluye un archivo de ejemplo llamado `.env.example` para facilitar este proceso.
+
+Debes crear tu propio archivo `.env` a partir del ejemplo.
+
+**Opción A: Desde la terminal (recomendado)**
+Simplemente copia el archivo de ejemplo con el siguiente comando:
+```bash
+cp .env.example .env
