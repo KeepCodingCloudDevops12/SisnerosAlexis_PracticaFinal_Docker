@@ -33,6 +33,9 @@ ENV FLASK_ENV production
 # Exponemos el puerto en el que corre nuestra aplicación
 EXPOSE 5000
 
+# Copiamos el archivo de configuración de logging JSON
+COPY ./gunicorn_logging.json .
+
 # El comando que se ejecutará cuando el contenedor inicie
 # Usamos gunicorn para un servidor WSGI más robusto que el de desarrollo de Flask
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--worker-class", "sync", "--log-level", "info", "--access-logfile", "-", "--error-logfile", "-", "--log-config-json", "gunicorn_logging.json", "app:app"]

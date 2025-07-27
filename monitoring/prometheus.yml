@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 15s # Con qué frecuencia recoger métricas
+
+scrape_configs:
+  - job_name: 'flask-app'
+    static_configs:
+      - targets: ['app:5000'] # El objetivo a monitorizar: nuestro servicio 'app' en su puerto interno

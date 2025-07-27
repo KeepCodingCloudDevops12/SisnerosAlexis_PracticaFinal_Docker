@@ -1,88 +1,92 @@
-# Práctica Final de Docker: Microservicio Contador Full Stack
+# Práctica Final de Docker: Microservicio Full Stack con Monitoreo
 
-Este proyecto es la implementación de la práctica final de Docker para el bootcamp de KeepCoding. Consiste en una aplicación web completa con una arquitectura de tres capas (frontend, backend, base de datos), totalmente containerizada y orquestada con Docker Compose.
+Este proyecto es la implementación de la práctica final de Docker para el bootcamp de KeepCoding. Consiste en una aplicación web completa con una arquitectura avanzada de microservicios, totalmente containerizada, orquestada con Docker Compose e integrada con una pila de monitoreo profesional.
 
 ## 🌟 Arquitectura del Proyecto
 
-El sistema está compuesto por tres servicios principales que se comunican a través de una red privada de Docker:
+El sistema está compuesto por **cinco servicios** que se comunican a través de una red privada de Docker:
 
-1.  **`frontend` (Proxy Inverso y UI):**
-    *   Un servidor web **Nginx** que actúa como el único punto de entrada a la aplicación.
-    *   Sirve una interfaz de usuario estática (HTML/CSS/JS) para interactuar con el contador.
-    *   Actúa como **proxy inverso**, redirigiendo las peticiones que empiezan por `/api/` al servicio de backend.
+### Servicios Principales
+1.  **`frontend` (Proxy Inverso y UI):** Un servidor web **Nginx** que actúa como el único punto de entrada a la aplicación. Sirve una interfaz de usuario estática y redirige las peticiones de API (`/api/*`) al backend.
+2.  **`app` (API Backend):** Una API REST con **Python/Flask** que gestiona la lógica de negocio. Se conecta a la base de datos para leer e incrementar un contador y expone métricas para Prometheus en el endpoint `/metrics`.
+3.  **`db` (Base de Datos):** Un servidor de base de datos **PostgreSQL** que almacena el estado del contador de forma persistente usando un volumen de Docker.
 
-2.  **`app` (API Backend):**
-    *   Una API REST construida con **Python** y el framework **Flask**.
-    *   Gestiona la lógica de negocio: se conecta a la base de datos para leer e incrementar el valor de un contador.
-    *   No está expuesta directamente al exterior, solo es accesible a través del proxy Nginx.
-
-3.  **`db` (Base de Datos):**
-    *   Un servidor de base de datos **PostgreSQL**.
-    *   Almacena el valor del contador.
-    *   Utiliza un **volumen de Docker** para garantizar la persistencia de los datos, incluso si el contenedor se elimina.
+### Pila de Monitoreo
+4.  **`prometheus` (Recolección de Métricas):** Un servidor **Prometheus** configurado para "raspar" (scrape) periódicamente el endpoint `/metrics` del servicio `app`, recolectando datos de rendimiento como latencias y número de peticiones.
+5.  **`grafana` (Visualización y Dashboards):** Una instancia de **Grafana** conectada a Prometheus como fuente de datos. Permite visualizar las métricas en tiempo real a través de dashboards interactivos.
 
 ## ✅ Hitos y Características Implementadas
 
-*   **Containerización completa:** Cada componente de la arquitectura corre en su propio contenedor Docker.
-*   **Orquestación con Docker Compose:** Se utiliza un único archivo `docker-compose.yml` para definir, construir y lanzar toda la aplicación.
-*   **Dockerfile Multi-Etapa:** La imagen del backend se construye usando un *multistage build* para minimizar su tamaño final, separando el entorno de construcción del de ejecución.
-*   **Persistencia de Datos:** El estado del contador sobrevive a reinicios de los contenedores gracias al uso de volúmenes de Docker.
-*   **Configuración por Variables de Entorno:** Las credenciales de la base de datos se gestionan de forma segura a través de variables de entorno y un archivo `.env`.
-*   **Imagen Pública en Docker Hub:** La imagen de la aplicación está disponible públicamente [aquí](https://hub.docker.com/r/alesisneros/docker-bootcamp-project).
-*   **Análisis de Seguridad:** La imagen ha sido escaneada con **Trivy** para detectar vulnerabilidades, y se han aplicado parches a las dependencias de Python.
-*   **Logging Centralizado:** Todos los servicios envían sus logs a STDOUT/STDERR, permitiendo una visualización centralizada en tiempo real con el comando `docker-compose logs`.
-*   **Monitorización Básica:** El estado de los servicios se puede monitorizar con `docker-compose ps`. Para una monitorización más detallada de recursos (CPU, memoria), se puede utilizar Portainer (ver sección Bonus).
+*   **Arquitectura Completa de 5 Servicios:** Despliegue de una aplicación realista con frontend, backend, base de datos y pila de monitoreo.
+*   **Orquestación con Docker Compose:** Un único archivo `docker-compose.yml` gestiona toda la arquitectura.
+*   **Dockerfile Multi-Etapa y Optimizado:** La imagen del backend se construye usando un *multistage build* para minimizar su tamaño final.
+*   **Persistencia de Datos:** Se utilizan volúmenes de Docker para los datos de PostgreSQL y Grafana, asegurando que ni los datos ni los dashboards se pierdan al reiniciar.
+*   **Logging Estructurado (JSON):** El backend está configurado para generar logs en formato JSON, facilitando su análisis y procesamiento por sistemas externos.
+*   **Monitoreo de Métricas Profesionales:** Integración de **Prometheus y Grafana** para la recolección y visualización de métricas de la aplicación.
+*   **Configuración Segura:** Gestión de credenciales a través de variables de entorno y un archivo `.env.example`.
+*   **Imagen Pública en Docker Hub:** La imagen de la aplicación está disponible públicamente.
+*   **Análisis de Seguridad:** Escaneo de vulnerabilidades de la imagen con **Trivy**.
 
 ## 🛠️ Requisitos Previos
 
-*   [Docker](https://www.docker.com/products/docker-desktop/)
-*   [Docker Compose](https://docs.docker.com/compose/install/) (normalmente incluido en Docker Desktop)
+*   [Docker](https://www.docker.com/products/docker-desktop/) & Docker Compose
 *   [Git](https://git-scm.com/)
 
-## 🚀 Instrucciones de Despliegue y Verificación
+## 🚀 Guía de Despliegue y Verificación
 
-Sigue estos pasos para poner en marcha el proyecto en tu máquina local.
-
-### 1. Clonar el Repositorio
+### Paso 1: Clonar el Repositorio
 
 ```bash
 git clone https://github.com/KeepCodingCloudDevops12/SisnerosAlexis_PracticaFinal_Docker.git
-cd PracticaFinal_Docker
+cd  PracticaFinal_Docker
 
-### 2: Crear el Archivo de Credenciales (`.env`)
-
-Este paso es **CRUCIAL**. La aplicación no funcionará sin él. El repositorio incluye un archivo de ejemplo llamado `.env.example` para facilitar este proceso.
-
-Debes crear tu propio archivo `.env` a partir del ejemplo.
-
-**Opción A: Desde la terminal (recomendado)**
-Simplemente copia el archivo de ejemplo con el siguiente comando:
-```bash
+### Paso 2: Crear el Archivo de Credenciales (.env)
+Este paso es CRUCIAL y la aplicación no funcionará sin él. Simplemente copia el archivo de ejemplo proporcionado:
+Generated bash
 cp .env.example .env
 
----
+```bash
 
-## Bonus: Visualización de Contenedores con Portainer (Opcional)
-
-Para gestionar los contenedores (ver logs, estadísticas, entrar a una terminal, etc.) a través de una interfaz gráfica de usuario, puedes desplegar Portainer.
-
-**Nota:** Portainer se ejecuta de forma independiente a la aplicación principal.
-
-### 1. Crear el Volumen de Datos de Portainer
+### Paso 3: Construir y Ejecutar Toda la Pila
+Este comando construirá las imágenes necesarias y levantará los cinco servicios en segundo plano.
+Generated bash
+docker-compose up --build -d
 
 ```bash
-docker volume create portainer_data
 
-2. Desplegar el Contenedor de Portainer
+### Paso 4: Verificar la Funcionalidad
 
-docker run -d -p 8000:8000 -p 9443:9443 --name portainer \
+Espera unos 20-30 segundos para que todos los servicios se inicien por completo.
+Verificar la Aplicación Web:
+Abre tu navegador y ve a ➡️ http://localhost ⬅️
+Deberías ver la interfaz del contador. Prueba el botón "Incrementar" para confirmar que la aplicación funciona.
+Verificar la Pila de Monitoreo:
+Prometheus: Abre http://localhost:9090. Ve a Status -> Targets. Deberías ver el target flask-app con el estado UP (en verde).
+Grafana: Abre http://localhost:3000. Inicia sesión con admin / admin. (Te pedirá cambiar la contraseña).
+Para ver las métricas, necesitas configurar Prometheus como fuente de datos (URL: http://prometheus:9090) y crear un panel simple.
+Verificar los Logs en JSON:
+Ejecuta docker-compose logs app en tu terminal. Verás que la salida está estructurada en formato JSON.
+Paso 5: Detener la Aplicación
+Para detener y eliminar todos los componentes del proyecto:
+Generated bash
+# Detiene y elimina contenedores y redes
+docker-compose down
+
+# Si además quieres eliminar TODOS los datos (contador y dashboards de Grafana):
+docker-compose down -v
+
+```bash
+
+Bonus: Visualización de Contenedores con Portainer (Opcional)
+Si prefieres una UI para gestionar los contenedores en lugar de la terminal, puedes desplegar Portainer de forma independiente.
+Crear el volumen: docker volume create portainer_data
+Desplegar el contenedor:
+Generated bash
+docker run -d -p 9443:9443 --name portainer \
     --restart=always \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v portainer_data:/data \
     portainer/portainer-ce:latest
 
-3. Acceder a Portainer
-Abre tu navegador web y navega a: https://localhost:9443
-Es posible que tu navegador te muestre una advertencia de seguridad porque Portainer usa un certificado SSL autofirmado. Simplemente acepta el riesgo y continúa.
-La primera vez que accedas, Portainer te pedirá que crees una contraseña para el usuario admin.
-Una vez dentro, podrás ver y gestionar todos tus contenedores, incluidos bootcamp-frontend, bootcamp-app y bootcamp-db.
+Bash
+Acceder: Navega a https://localhost:9443 (acepta la advertencia de seguridad). La primera vez, configura la contraseña de admin.

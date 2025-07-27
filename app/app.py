@@ -2,6 +2,7 @@ import os
 import time
 from flask import Flask, jsonify
 import psycopg2
+from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
 
@@ -11,6 +12,7 @@ db_user = os.getenv("POSTGRES_USER")
 db_pass = os.getenv("POSTGRES_PASSWORD")
 db_host = os.getenv("DB_HOST", "db") # Usamos 'db' como default, el nombre del servicio en docker-compose
 db_port = os.getenv("DB_PORT", "5432")
+metrics = PrometheusMetrics(app)
 
 def get_db_connection():
     """Establece conexión con la base de datos."""
