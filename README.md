@@ -30,6 +30,8 @@ El sistema está compuesto por tres servicios principales que se comunican a tra
 *   **Configuración por Variables de Entorno:** Las credenciales de la base de datos se gestionan de forma segura a través de variables de entorno y un archivo `.env`.
 *   **Imagen Pública en Docker Hub:** La imagen de la aplicación está disponible públicamente [aquí](https://hub.docker.com/r/alesisneros/docker-bootcamp-project).
 *   **Análisis de Seguridad:** La imagen ha sido escaneada con **Trivy** para detectar vulnerabilidades, y se han aplicado parches a las dependencias de Python.
+*   **Logging Centralizado:** Todos los servicios envían sus logs a STDOUT/STDERR, permitiendo una visualización centralizada en tiempo real con el comando `docker-compose logs`.
+*   **Monitorización Básica:** El estado de los servicios se puede monitorizar con `docker-compose ps`. Para una monitorización más detallada de recursos (CPU, memoria), se puede utilizar Portainer (ver sección Bonus).
 
 ## 🛠️ Requisitos Previos
 
@@ -57,3 +59,16 @@ Debes crear tu propio archivo `.env` a partir del ejemplo.
 Simplemente copia el archivo de ejemplo con el siguiente comando:
 ```bash
 cp .env.example .env
+
+---
+
+## Bonus: Visualización de Contenedores con Portainer (Opcional)
+
+Para gestionar los contenedores (ver logs, estadísticas, entrar a una terminal, etc.) a través de una interfaz gráfica de usuario, puedes desplegar Portainer.
+
+**Nota:** Portainer se ejecuta de forma independiente a la aplicación principal.
+
+### 1. Crear el Volumen de Datos de Portainer
+
+```bash
+docker volume create portainer_data
