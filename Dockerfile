@@ -1,7 +1,7 @@
 # --- ETAPA 1: BUILDER ---
 # Usamos una imagen completa de Python para instalar dependencias.
 # Le ponemos un alias "builder" para referenciarla luego.
-FROM python:3.9-slim as builder
+FROM python:3.9-alpine as builder
 
 # Establecemos el directorio de trabajo
 WORKDIR /install
@@ -10,13 +10,11 @@ WORKDIR /install
 COPY app/requirements.txt .
 
 # Instalamos las dependencias en un directorio local
-# --no-cache-dir para no guardar cache y -r para leer el archivo.
-# El prefijo /install asegura que se instalen en este directorio
 RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
 
 # --- ETAPA 2: FINAL ---
 # Usamos una imagen "slim" que es mucho más ligera.
-FROM python:3.9-slim
+FROM python:3.9-alpine
 
 # Establecemos el directorio de trabajo en la imagen final
 WORKDIR /app
@@ -38,4 +36,3 @@ EXPOSE 5000
 # El comando que se ejecutará cuando el contenedor inicie
 # Usamos gunicorn para un servidor WSGI más robusto que el de desarrollo de Flask
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
-```*Actualización:* He cambiado el `CMD` para usar `gunicorn`, un servidor más adecuado para producción. Primero, añade `gunicorn` a tu `app/requirements.txt`:
