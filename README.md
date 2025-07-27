@@ -1,91 +1,48 @@
-# Proyecto Bootcamp Docker: Microservicio Contador con Flask y PostgreSQL
+# Práctica Final de Docker: Microservicio Contador Full Stack
 
-Este proyecto es una práctica para el bootcamp de KeepCoding que implementa un microservicio simple capaz de leer y escribir en una base de datos, todo desplegado con Docker Compose.
+Este proyecto es la implementación de la práctica final de Docker para el bootcamp de KeepCoding. Consiste en una aplicación web completa con una arquitectura de tres capas (frontend, backend, base de datos), totalmente containerizada y orquestada con Docker Compose.
 
-## Descripción de la Aplicación
+## 🌟 Arquitectura del Proyecto
 
-La aplicación es una API REST simple construida con Flask (Python) que expone un contador. El valor de este contador persiste en una base de datos PostgreSQL.
+El sistema está compuesto por tres servicios principales que se comunican a través de una red privada de Docker:
 
-La API tiene 3 rutas (endpoints):
-- `GET /`: Devuelve un mensaje de estado para verificar que la API está funcionando.
-- `GET /counter`: Devuelve el valor actual del contador desde la base de datos.
-- `POST /counter/increment`: Incrementa en 1 el valor del contador en la base de datos.
+1.  **`frontend` (Proxy Inverso y UI):**
+    *   Un servidor web **Nginx** que actúa como el único punto de entrada a la aplicación.
+    *   Sirve una interfaz de usuario estática (HTML/CSS/JS) para interactuar con el contador.
+    *   Actúa como **proxy inverso**, redirigiendo las peticiones que empiezan por `/api/` al servicio de backend.
 
-## Funcionamiento de la Aplicación
+2.  **`app` (API Backend):**
+    *   Una API REST construida con **Python** y el framework **Flask**.
+    *   Gestiona la lógica de negocio: se conecta a la base de datos para leer e incrementar el valor de un contador.
+    *   No está expuesta directamente al exterior, solo es accesible a través del proxy Nginx.
 
-La arquitectura consta de dos componentes principales orquestados por Docker Compose:
-1.  **`app`**: Un contenedor con la aplicación Flask/Python.
-2.  **`db`**: Un contenedor con la base de datos PostgreSQL.
+3.  **`db` (Base de Datos):**
+    *   Un servidor de base de datos **PostgreSQL**.
+    *   Almacena el valor del contador.
+    *   Utiliza un **volumen de Docker** para garantizar la persistencia de los datos, incluso si el contenedor se elimina.
 
-La aplicación se conecta a la base de datos utilizando el nombre del servicio `db` como host. Los datos de la base de datos se guardan en un volumen de Docker para garantizar la persistencia incluso si el contenedor se elimina y se vuelve a crear.
+## ✅ Hitos y Características Implementadas
 
-## Requisitos para Ejecutar
+*   **Containerización completa:** Cada componente de la arquitectura corre en su propio contenedor Docker.
+*   **Orquestación con Docker Compose:** Se utiliza un único archivo `docker-compose.yml` para definir, construir y lanzar toda la aplicación.
+*   **Dockerfile Multi-Etapa:** La imagen del backend se construye usando un *multistage build* para minimizar su tamaño final, separando el entorno de construcción del de ejecución.
+*   **Persistencia de Datos:** El estado del contador sobrevive a reinicios de los contenedores gracias al uso de volúmenes de Docker.
+*   **Configuración por Variables de Entorno:** Las credenciales de la base de datos se gestionan de forma segura a través de variables de entorno y un archivo `.env`.
+*   **Imagen Pública en Docker Hub:** La imagen de la aplicación está disponible públicamente [aquí](https://hub.docker.com/r/alesisneros/docker-bootcamp-project).
+*   **Análisis de Seguridad:** La imagen ha sido escaneada con **Trivy** para detectar vulnerabilidades, y se han aplicado parches a las dependencias de Python.
 
-- [Docker](https://www.docker.com/products/docker-desktop/)
-- [Docker Compose](https://docs.docker.com/compose/install/) (incluido en Docker Desktop)
-- Git
+## 🛠️ Requisitos Previos
 
-## Instrucciones para Ejecución
+*   [Docker](https://www.docker.com/products/docker-desktop/)
+*   [Docker Compose](https://docs.docker.com/compose/install/) (normalmente incluido en Docker Desktop)
+*   [Git](https://git-scm.com/)
 
-1.  **Clonar el repositorio:**
-    ```bash
-    git clone https://github.com/<tu-usuario>/docker-bootcamp-project.git
-    cd docker-bootcamp-project
-    ```
+## 🚀 Instrucciones de Despliegue y Verificación
 
-2.  **Crear el archivo de configuración:**
-    Crea un archivo llamado `.env` en la raíz del proyecto y añade las siguientes variables. Este archivo define las credenciales de la base de datos.
-    ```
-    POSTGRES_DB=bootcampdb
-    POSTGRES_USER=bootcampuser
-    POSTGRES_PASSWORD=supersecretpassword
-    ```
+Sigue estos pasos para poner en marcha el proyecto en tu máquina local.
 
-3.  **Construir y ejecutar los contenedores:**
-    Este comando construirá la imagen de la aplicación (si no existe) y levantará ambos servicios en segundo plano (`-d`).
-    ```bash
-    docker-compose up --build -d
-    ```
+### 1. Clonar el Repositorio
 
-4.  **Verificar el funcionamiento:**
-    - **Verificar los logs:** Puedes ver los logs de la aplicación para asegurarte de que se conectó correctamente a la base de datos.
-      ```bash
-      docker-compose logs -f app
-      ```
-      Deberías ver mensajes como "¡Conexión a la base de datos exitosa!" e "¡Aplicación lista para recibir peticiones!". Presiona `Ctrl+C` para salir.
-
-    - **Probar la API con `curl`:**
-      ```bash
-      # Verificar estado
-      curl http://localhost:5000/
-
-      # Obtener valor inicial (debería ser 0)
-      curl http://localhost:5000/counter
-
-      # Incrementar el valor
-      curl -X POST http://localhost:5000/counter/increment
-
-      # Verificar el nuevo valor (debería ser 1)
-      curl http://localhost:5000/counter
-      ```
-
-5.  **Detener la aplicación:**
-    Para detener y eliminar los contenedores, ejecuta:
-    ```bash
-    docker-compose down
-    ```
-    Si quieres eliminar también el volumen de la base de datos (se perderán todos los datos), ejecuta:
-    ```bash
-    docker-compose down -v
-    ```
-
-## Configuración
-
-La aplicación se configura mediante variables de entorno, definidas en el archivo `.env`.
-
-| Variable | Descripción | Default en `docker-compose.yml` |
-| --- | --- | --- |
-| `POSTGRES_DB` | Nombre de la base de datos. | `bootcampdb` |
-| `POSTGRES_USER` | Usuario de la base de datos. | `bootcampuser` |
-| `POSTGRES_PASSWORD`| Contraseña del usuario. | `supersecretpassword` |
-| `DB_HOST` | Host de la base de datos. | `db` |
+```bash
+git clone https://github.com/KeepCodingCloudDevops12/SisnerosAlexis_PracticaFinalDocker.git
+cd SisnerosAlexis_PracticaFinalDocker
