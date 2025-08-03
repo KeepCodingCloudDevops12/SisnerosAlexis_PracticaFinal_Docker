@@ -38,7 +38,7 @@ El sistema está compuesto por **cinco servicios** que se comunican a través de
 
 ```bash
 git clone https://github.com/KeepCodingCloudDevops12/SisnerosAlexis_PracticaFinal_Docker.git
-cd PracticaFinal_Docker
+cd SisnerosAlexis_PracticaFinal_Docker
 
 Paso 2: Crear el Archivo de Credenciales (.env)
 Este paso es CRUCIAL y la aplicación no funcionará sin él. Simplemente copia el archivo de ejemplo proporcionado:
